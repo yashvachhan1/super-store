@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { Plus, Search, MoreVertical, Edit2, Trash2, ExternalLink, Image as ImageIcon, Globe, Upload, Download, FileText, CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { Plus, Search, Edit2, Trash2, Image as ImageIcon, Globe, Upload, Download, FileText, CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
+
 import Papa from "papaparse";
-import { collection, onSnapshot, query, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { collection, onSnapshot, query, addDoc, deleteDoc, doc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 interface Brand {
@@ -99,7 +99,7 @@ export default function Brands() {
                     setUploadProgress('error');
                 }
             },
-            error: (error: Error) => {
+            error: () => {
                 setUploadProgress('error');
             }
         });

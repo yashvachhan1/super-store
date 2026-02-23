@@ -4,7 +4,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Store, ShieldCheck, ArrowRight, Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+
 
 export default function Login() {
     const [email, setEmail] = useState("");

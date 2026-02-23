@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { Plus, Search, MoreVertical, Edit2, Trash2, ChevronRight, Image as ImageIcon, Layers, Upload, Download, FileText, CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { Plus, Search, Edit2, Trash2, ChevronRight, Image as ImageIcon, Upload, Download, FileText, CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
+
 import Papa from "papaparse";
-import { collection, onSnapshot, query, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { collection, onSnapshot, query, addDoc, deleteDoc, doc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 interface Category {
@@ -29,7 +29,6 @@ export default function Categories() {
     const [newParent, setNewParent] = useState("None (Root)");
     const [newImage, setNewImage] = useState("");
     const [isSaving, setIsSaving] = useState(false);
-    const [error, setError] = useState("");
 
     useEffect(() => {
         const q = query(collection(db, "categories"));
@@ -48,7 +47,6 @@ export default function Categories() {
         e.preventDefault();
         if (!newName) return;
         setIsSaving(true);
-        setError("");
         try {
             await addDoc(collection(db, "categories"), {
                 name: newName,
@@ -64,7 +62,6 @@ export default function Categories() {
             setNewImage("");
         } catch (err: any) {
             console.error("Error creating category:", err);
-            setError(err.message || "Failed to create category. Check permissions.");
             alert("Error: " + (err.message || "Failed to create category"));
         } finally {
             setIsSaving(false);
@@ -103,7 +100,7 @@ export default function Categories() {
                     setUploadProgress('error');
                 }
             },
-            error: (error: Error) => {
+            error: () => {
                 setUploadProgress('error');
             }
         });
