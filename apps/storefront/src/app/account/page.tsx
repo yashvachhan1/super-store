@@ -1,0 +1,163 @@
+"use client";
+
+import Link from "next/link";
+import { User, Package, MapPin, CreditCard, Settings, LogOut, ArrowRight, Heart, ShoppingBag, Search, Menu, Loader2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
+import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
+
+export default function AccountPage() {
+    const { cart } = useCart();
+    const { user, loading, logout } = useAuth();
+    const router = useRouter();
+    const [activeTab, setActiveTab] = useState("profile");
+
+    useEffect(() => {
+        if (!loading && !user) {
+            router.push("/login");
+        }
+    }, [user, loading, router]);
+
+    const orders = [
+        { id: "ORD-9281", date: "Feb 12, 2026", status: "Delivered", total: "$240.00", items: 2 },
+        { id: "ORD-8821", date: "Jan 28, 2026", status: "Shipped", total: "$110.00", items: 1 },
+    ];
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+                <Loader2 className="w-10 h-10 animate-spin text-black" />
+                <p className="text-[10px] font-black uppercase tracking-[0.5em] text-gray-400">Syncing Identity...</p>
+            </div>
+        );
+    }
+
+    if (!user) return null;
+
+    const initials = user.displayName ? user.displayName.split(' ').map(n => n[0]).join('').toUpperCase() : "U";
+
+    return (
+        <div className="min-h-screen bg-white font-sans text-gray-900">
+            <main className="max-w-7xl mx-auto px-8 py-16">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+
+                    {/* Sidebar Navigation */}
+                    <aside className="lg:col-span-3 space-y-8">
+                        <div className="flex items-center gap-4 mb-12">
+                            <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center text-white font-black text-2xl">{initials}</div>
+                            <div>
+                                <h2 className="text-xl font-black uppercase tracking-tight">{user.displayName || "Elite Member"}</h2>
+                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Premium Member</p>
+                            </div>
+                        </div>
+
+                        <nav className="space-y-2">
+                            {[
+                                { id: "profile", label: "Profile Details", icon: User },
+                                { id: "orders", label: "My Orders", icon: Package },
+                                { id: "addresses", label: "Addresses", icon: MapPin },
+                                { id: "payment", label: "Payment Info", icon: CreditCard },
+                                { id: "settings", label: "Security", icon: Settings },
+                            ].map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all ${activeTab === tab.id ? 'bg-black text-white shadow-xl' : 'hover:bg-gray-50 text-gray-400'}`}
+                                >
+                                    <tab.icon className="w-4 h-4" />
+                                    {tab.label}
+                                </button>
+                            ))}
+                            <button
+                                onClick={() => logout()}
+                                className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] text-red-400 hover:bg-red-50 transition-all mt-8"
+                            >
+                                <LogOut className="w-4 h-4" />
+                                Sign Out
+                            </button>
+                        </nav>
+                    </aside>
+
+                    {/* Content Area */}
+                    <div className="lg:col-span-9">
+                        <AnimatePresence mode="wait">
+                            {activeTab === "profile" && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    className="space-y-12"
+                                >
+                                    <h1 className="text-5xl font-black uppercase tracking-tighter italic">Profile Details</h1>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        <div className="space-y-2">
+                                            <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 ml-2">Full Name</label>
+                                            <div className="bg-gray-50 p-6 rounded-3xl font-bold">{user.displayName || "Not Set"}</div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 ml-2">Email Address</label>
+                                            <div className="bg-gray-50 p-6 rounded-3xl font-bold">{user.email}</div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 ml-2">User ID</label>
+                                            <div className="bg-gray-50 p-6 rounded-3xl font-bold text-[10px]">{user.uid}</div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 ml-2">Status</label>
+                                            <div className="bg-gray-50 p-6 rounded-3xl font-bold flex justify-between items-center text-[10px] uppercase tracking-widest">
+                                                Verified Member
+                                                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button className="bg-black text-white px-12 py-5 rounded-full font-black uppercase tracking-widest text-[10px] hover:shadow-2xl transition-shadow">
+                                        Edit Profile
+                                    </button>
+                                </motion.div>
+                            )}
+
+                            {activeTab === "orders" && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    className="space-y-12"
+                                >
+                                    <h1 className="text-5xl font-black uppercase tracking-tighter italic">Order History</h1>
+                                    <div className="space-y-6">
+                                        {orders.map(order => (
+                                            <div key={order.id} className="border border-gray-100 p-8 rounded-[2rem] flex flex-col md:flex-row justify-between items-start md:items-center gap-8 group hover:border-black transition-colors">
+                                                <div>
+                                                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 mb-2">{order.date}</p>
+                                                    <h3 className="text-xl font-black uppercase tracking-tight">{order.id}</h3>
+                                                </div>
+                                                <div className="flex gap-12">
+                                                    <div>
+                                                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 mb-2">Status</p>
+                                                        <span className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full ${order.status === 'Delivered' ? 'bg-green-50 text-green-600' : 'bg-blue-50 text-blue-600'}`}>
+                                                            {order.status}
+                                                        </span>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 mb-2">Total</p>
+                                                        <span className="text-xl font-black italic">{order.total}</span>
+                                                    </div>
+                                                </div>
+                                                <button className="bg-gray-50 p-4 rounded-full group-hover:bg-black group-hover:text-white transition-colors">
+                                                    <ArrowRight className="w-5 h-5" />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+
+                </div>
+            </main>
+        </div>
+    );
+}
