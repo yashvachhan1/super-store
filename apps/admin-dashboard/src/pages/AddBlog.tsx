@@ -15,6 +15,7 @@ export default function AddBlog() {
     const [image, setImage] = useState('');
     const [isPublishing, setIsPublishing] = useState(false);
     const [isFetching, setIsFetching] = useState(false);
+    const [isUploadingImage, setIsUploadingImage] = useState(false);
 
     useEffect(() => {
         if (id) {
@@ -42,9 +43,30 @@ export default function AddBlog() {
         }
     };
 
-    const handleUploadImage = () => {
-        const url = prompt("Enter Blog Header Image URL (Demo):");
-        if (url) setImage(url);
+    const handleFileUpload = async (file: File) => {
+        setIsUploadingImage(true);
+        try {
+            return new Promise<string>((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result as string);
+                reader.onerror = (err) => reject(err);
+                reader.readAsDataURL(file);
+            });
+        } catch (error) {
+            console.error("Conversion error:", error);
+            alert("Failed to process image.");
+            return null;
+        } finally {
+            setIsUploadingImage(false);
+        }
+    };
+
+    const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const base64 = await handleFileUpload(file);
+            if (base64) setImage(base64);
+        }
     };
 
     const handleSave = async (forceStatus?: string) => {
@@ -179,10 +201,19 @@ export default function AddBlog() {
                         </h4>
 
                         <div
-                            onClick={handleUploadImage}
+                            onClick={() => document.getElementById('blog-image-upload')?.click()}
                             className="aspect-[4/3] bg-muted/30 border-2 border-dashed border-muted rounded-[2rem] flex flex-col items-center justify-center gap-4 hover:border-black cursor-pointer group transition-all relative overflow-hidden"
                         >
-                            {image ? (
+                            <input
+                                id="blog-image-upload"
+                                type="file"
+                                className="hidden"
+                                accept="image/*"
+                                onChange={handleImageChange}
+                            />
+                            {isUploadingImage ? (
+                                <Loader2 className="w-8 h-8 animate-spin text-black" />
+                            ) : image ? (
                                 <>
                                     <img src={image} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="Featured" />
                                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all">

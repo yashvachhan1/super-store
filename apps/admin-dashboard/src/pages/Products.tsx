@@ -159,9 +159,9 @@ export default function Products() {
                                     <td className="px-8 py-6 text-[11px] font-black italic tracking-tight">${product.price}</td>
                                     <td className="px-8 py-6">
                                         <div className="flex gap-2">
-                                            <button className="p-2 hover:bg-black hover:text-white rounded-xl transition-all">
+                                            <Link to={`/products/edit/${product.id}`} className="p-2 hover:bg-black hover:text-white rounded-xl transition-all">
                                                 <Edit2 className="w-4 h-4" />
-                                            </button>
+                                            </Link>
                                             <button
                                                 onClick={() => handleDelete(product.id)}
                                                 className="p-2 hover:bg-red-500 hover:text-white rounded-xl transition-all"

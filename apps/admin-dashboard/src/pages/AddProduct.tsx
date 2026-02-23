@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { Plus, ArrowLeft, Image as ImageIcon, Sparkles, Wand2, X, Box, ChevronDown, Loader2 } from "lucide-react";
+import { Plus, ArrowLeft, Image as ImageIcon, Sparkles, Wand2, X, Box, ChevronDown, Loader2, RefreshCw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { collection, onSnapshot, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, onSnapshot, addDoc, serverTimestamp, doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 interface Attribute {
@@ -23,6 +23,7 @@ interface Variant {
 
 export default function AddProduct() {
     const navigate = useNavigate();
+    const { id } = useParams();
     const [productType, setProductType] = useState<'simple' | 'variable'>('simple');
     const [attributes, setAttributes] = useState<Attribute[]>([]);
     const [variants, setVariants] = useState<Variant[]>([]);
@@ -38,6 +39,9 @@ export default function AddProduct() {
     const [category, setCategory] = useState('');
     const [brand, setBrand] = useState('');
     const [isPublishing, setIsPublishing] = useState(false);
+    const [isMatrixSwapped, setIsMatrixSwapped] = useState(false);
+    const [uploadingMain, setUploadingMain] = useState(false);
+    const [uploadingVariantId, setUploadingVariantId] = useState<string | null>(null);
 
     // Taxonomies State
     const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
@@ -50,8 +54,30 @@ export default function AddProduct() {
         const unsubBrands = onSnapshot(collection(db, "brands"), (snap) => {
             setBrands(snap.docs.map(doc => ({ id: doc.id, name: doc.data().name })));
         });
+
+        if (id) {
+            getDoc(doc(db, "products", id)).then(snap => {
+                if (snap.exists()) {
+                    const data = snap.data();
+                    setName(data.name || '');
+                    setProductType(data.type || 'simple');
+                    setPrice(String(data.price || ''));
+                    setStock(String(data.stock || ''));
+                    setSku(data.sku || '');
+                    setDescription(data.description || '');
+                    setShortDescription(data.shortDescription || '');
+                    setImages(data.images || []);
+                    setCategory(data.category || '');
+                    setBrand(data.brand || '');
+                    setAttributes(data.attributes || []);
+                    setVariants(data.variants || []);
+                    setIsMatrixSwapped(data.isMatrixSwapped || false);
+                }
+            });
+        }
+
         return () => { unsubCats(); unsubBrands(); };
-    }, []);
+    }, [id]);
 
     const handlePublish = async () => {
         if (!name || (!price && productType === 'simple') || !category) {
@@ -72,14 +98,23 @@ export default function AddProduct() {
                 category,
                 brand,
                 type: productType,
+                isMatrixSwapped,
                 createdAt: serverTimestamp(),
                 attributes: productType === 'variable' ? attributes : [],
                 variants: productType === 'variable' ? variants : []
             };
 
-            await addDoc(collection(db, "products"), productData);
+            if (id) {
+                await updateDoc(doc(db, "products", id), productData);
+                alert('Product DNA Updated Successfully!');
+            } else {
+                await addDoc(collection(db, "products"), {
+                    ...productData,
+                    createdAt: serverTimestamp()
+                });
+                alert('Product DNA Synthesized Successfully!');
+            }
             setIsPublishing(false);
-            alert('Product DNA Synthesized Successfully!');
             navigate('/products');
         } catch (error) {
             console.error("Error publishing product:", error);
@@ -88,14 +123,36 @@ export default function AddProduct() {
         }
     };
 
-    const handleMainImageAdd = () => {
-        const url = prompt('Enter Image URL (Demo):');
-        if (url) setImages([...images, url]);
+    const handleFileUpload = async (file: File, onProgress: (loading: boolean) => void) => {
+        onProgress(true);
+        try {
+            return new Promise<string>((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result as string);
+                reader.onerror = (err) => reject(err);
+                reader.readAsDataURL(file);
+            });
+        } catch (error) {
+            console.error("Conversion error:", error);
+            alert("Failed to process image.");
+            return null;
+        } finally {
+            onProgress(false);
+        }
     };
 
-    const handleVariantImageAdd = (vId: string) => {
-        const url = prompt('Enter Variant Image URL (Demo):');
-        if (url) updateVariant(vId, 'image', url);
+    const handleMainImageAdd = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const base64 = await handleFileUpload(file, setUploadingMain);
+        if (base64) setImages([...images, base64]);
+    };
+
+    const handleVariantImageAdd = async (vId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const base64 = await handleFileUpload(file, (loading) => setUploadingVariantId(loading ? vId : null));
+        if (base64) updateVariant(vId, 'image', base64);
     };
 
     const removeImage = (idx: number) => {
@@ -185,6 +242,8 @@ export default function AddProduct() {
         );
     };
 
+    const [isMatrixView, setIsMatrixView] = useState(false);
+
     const applyBulkAction = () => {
         if (!bulkAction) return;
 
@@ -199,6 +258,35 @@ export default function AddProduct() {
         }
         setBulkAction('');
     };
+
+    const matrixData = (() => {
+        if (variants.length === 0 || attributes.length === 0) return null;
+
+        let rowAttr, colAttr;
+        let rowValues, colValues;
+
+        if (isMatrixSwapped) {
+            rowAttr = attributes[1]?.name || attributes[0].name;
+            colAttr = attributes[1] ? attributes[0].name : 'Default';
+            rowValues = attributes[1]?.values || attributes[0].values;
+            colValues = attributes[1] ? attributes[0].values : ['Default'];
+        } else {
+            rowAttr = attributes[0].name || 'Attr 1';
+            colAttr = attributes[1]?.name || 'Default';
+            rowValues = attributes[0].values;
+            colValues = attributes[1]?.values || ['Default'];
+        }
+
+        const grid: Record<string, Record<string, Variant>> = {};
+        variants.forEach(v => {
+            const r = v.combination[rowAttr];
+            const c = colAttr === 'Default' ? 'Default' : v.combination[colAttr];
+            if (!grid[r]) grid[r] = {};
+            grid[r][c] = v;
+        });
+
+        return { rowAttr, colAttr, rowValues, colValues, grid };
+    })();
 
     const updateVariant = (id: string, field: keyof Variant, value: any) => {
         setVariants(variants.map(v => v.id === id ? { ...v, [field]: value } : v));
@@ -329,15 +417,24 @@ export default function AddProduct() {
                                     </button>
                                 </div>
                             ))}
-                            <button
-                                onClick={handleMainImageAdd}
-                                className="col-span-1 aspect-square border-2 border-dashed border-muted rounded-3xl flex flex-col items-center justify-center gap-2 hover:border-black cursor-pointer group transition-all"
-                            >
-                                <div className="w-10 h-10 bg-muted rounded-xl flex items-center justify-center group-hover:bg-black group-hover:text-white transition-all">
-                                    <Plus className="w-5 h-5" />
-                                </div>
-                                <p className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Add Visual</p>
-                            </button>
+                            <label className="col-span-1 aspect-square border-2 border-dashed border-muted rounded-3xl flex flex-col items-center justify-center gap-2 hover:border-black cursor-pointer group transition-all relative">
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={handleMainImageAdd}
+                                />
+                                {uploadingMain ? (
+                                    <Loader2 className="w-6 h-6 animate-spin text-black" />
+                                ) : (
+                                    <>
+                                        <div className="w-10 h-10 bg-muted rounded-xl flex items-center justify-center group-hover:bg-black group-hover:text-white transition-all">
+                                            <Plus className="w-5 h-5" />
+                                        </div>
+                                        <p className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">Add Visual</p>
+                                    </>
+                                )}
+                            </label>
                         </div>
                     </div>
 
@@ -455,6 +552,24 @@ export default function AddProduct() {
 
                                             {/* Bulk Actions Like WP */}
                                             <div className="flex gap-2">
+                                                <button
+                                                    onClick={() => setIsMatrixSwapped(!isMatrixSwapped)}
+                                                    className="px-6 py-2 rounded-full text-[9px] font-black uppercase tracking-widest border border-border bg-white text-black hover:bg-muted transition-all flex items-center gap-2"
+                                                    title="Swap Matrix Axes"
+                                                >
+                                                    <RefreshCw className="w-3 h-3" />
+                                                    Swap Axes
+                                                </button>
+                                                <button
+                                                    onClick={() => setIsMatrixView(!isMatrixView)}
+                                                    className={cn(
+                                                        "px-6 py-2 rounded-full text-[9px] font-black uppercase tracking-widest border transition-all flex items-center gap-2",
+                                                        isMatrixView ? "bg-black text-white border-black" : "bg-white text-black border-border hover:bg-muted"
+                                                    )}
+                                                >
+                                                    <Box className="w-3 h-3" />
+                                                    {isMatrixView ? 'List View' : 'Matrix View'}
+                                                </button>
                                                 <select
                                                     value={bulkAction}
                                                     onChange={(e) => setBulkAction(e.target.value)}
@@ -472,140 +587,209 @@ export default function AddProduct() {
                                             </div>
                                         </div>
 
-                                        <div className="space-y-6">
-                                            {variants.map((variant, vIdx) => {
-                                                const isExpanded = expandedVariants.includes(variant.id);
-                                                return (
-                                                    <motion.div
-                                                        key={variant.id}
-                                                        initial={{ opacity: 0, scale: 0.98 }}
-                                                        animate={{ opacity: 1, scale: 1 }}
-                                                        transition={{ delay: vIdx * 0.05 }}
-                                                        className="bg-white border border-border rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-xl transition-all"
-                                                    >
-                                                        {/* Row Header (Collapsed State) */}
-                                                        <div
-                                                            onClick={() => toggleVariant(variant.id)}
-                                                            className="bg-muted/30 p-6 flex justify-between items-center cursor-pointer group hover:bg-muted/50 transition-all"
-                                                        >
-                                                            <div className="flex gap-6 items-center">
-                                                                <div className="w-14 h-14 bg-white rounded-2xl border border-border flex items-center justify-center shadow-inner overflow-hidden">
-                                                                    {variant.image ? (
-                                                                        <img src={variant.image} className="w-full h-full object-cover" alt="Variant" />
-                                                                    ) : (
-                                                                        <ImageIcon className="w-5 h-5 text-muted-foreground/30" />
-                                                                    )}
-                                                                </div>
-                                                                <div>
-                                                                    <div className="flex gap-2 items-center">
-                                                                        {Object.entries(variant.combination).map(([k, v]) => (
-                                                                            <span key={k} className="bg-black text-white text-[8px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md">{v}</span>
-                                                                        ))}
-                                                                    </div>
-                                                                    <p className="text-[10px] font-bold text-muted-foreground mt-1.5 uppercase tracking-widest">SKU: {variant.sku || 'UNASSIGNED'}</p>
-                                                                </div>
-                                                            </div>
-                                                            <div className="flex gap-10 items-center">
-                                                                <div className="text-right">
-                                                                    <p className="text-[9px] font-black text-muted-foreground uppercase">Price</p>
-                                                                    <p className="text-sm font-black italic tracking-tighter">${variant.price || '0.00'}</p>
-                                                                </div>
-                                                                <div className="text-right">
-                                                                    <p className="text-[9px] font-black text-muted-foreground uppercase">Stock</p>
-                                                                    <p className="text-sm font-black italic tracking-tighter text-green-600">{variant.stock || '0'}</p>
-                                                                </div>
-                                                                <div className={cn(
-                                                                    "w-10 h-10 rounded-full flex items-center justify-center bg-white border border-border group-hover:bg-black group-hover:text-white transition-all",
-                                                                    isExpanded && "bg-black text-white rotate-180"
-                                                                )}>
-                                                                    <ChevronDown className="w-4 h-4" />
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        {/* Expanded Row Content (Detailed WP Form) */}
-                                                        <AnimatePresence>
-                                                            {isExpanded && (
-                                                                <motion.div
-                                                                    initial={{ height: 0, opacity: 0 }}
-                                                                    animate={{ height: "auto", opacity: 1 }}
-                                                                    exit={{ height: 0, opacity: 0 }}
-                                                                    className="overflow-hidden"
-                                                                >
-                                                                    <div className="p-10 border-t border-border/50 bg-white grid grid-cols-3 gap-10">
-                                                                        {/* Left: Media */}
-                                                                        <div className="space-y-4">
-                                                                            <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Variant visual</label>
-                                                                            <div
-                                                                                onClick={() => handleVariantImageAdd(variant.id)}
-                                                                                className="aspect-square bg-muted/20 border-2 border-dashed border-muted rounded-3xl flex flex-col items-center justify-center gap-3 hover:border-black cursor-pointer group transition-all p-6 overflow-hidden relative"
-                                                                            >
-                                                                                {variant.image ? (
-                                                                                    <>
-                                                                                        <img src={variant.image} className="absolute inset-0 w-full h-full object-cover" alt="Variant" />
-                                                                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all text-white text-[8px] font-black uppercase">Change Image</div>
-                                                                                    </>
-                                                                                ) : (
-                                                                                    <>
-                                                                                        <div className="w-10 h-10 bg-white rounded-2xl flex items-center justify-center shadow-sm">
-                                                                                            <Plus className="w-5 h-5" />
-                                                                                        </div>
-                                                                                        <p className="text-[8px] font-black uppercase tracking-widest text-muted-foreground text-center">Add unique<br />image</p>
-                                                                                    </>
-                                                                                )}
-                                                                            </div>
-                                                                        </div>
-
-                                                                        {/* Center/Right: Details */}
-                                                                        <div className="col-span-2 grid grid-cols-2 gap-8">
-                                                                            <div className="space-y-4">
-                                                                                <div className="space-y-2">
-                                                                                    <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground ml-1">SKU</label>
-                                                                                    <input
-                                                                                        type="text"
-                                                                                        value={variant.sku}
-                                                                                        onChange={(e) => updateVariant(variant.id, 'sku', e.target.value)}
-                                                                                        className="w-full bg-muted/30 px-6 py-3 rounded-2xl border-none outline-none font-bold text-[10px] uppercase tracking-widest focus:bg-white focus:ring-1 ring-black transition-all"
-                                                                                    />
-                                                                                </div>
-                                                                                <div className="space-y-2">
-                                                                                    <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground ml-1">Regular Price ($)</label>
+                                        {isMatrixView && matrixData ? (
+                                            <div className="overflow-x-auto ring-1 ring-border rounded-[2rem] bg-white shadow-xl">
+                                                <table className="w-full text-left border-collapse">
+                                                    <thead>
+                                                        <tr>
+                                                            <th className="px-6 py-6 bg-muted/30 border-b border-r border-border italic">
+                                                                <span className="text-[10px] font-black text-black uppercase tracking-widest font-mono">
+                                                                    {matrixData.rowAttr} / {matrixData.colAttr}
+                                                                </span>
+                                                            </th>
+                                                            {matrixData.colValues.map((col: string) => (
+                                                                <th key={col} className="px-6 py-4 text-[9px] font-black uppercase tracking-widest text-black text-center border-b border-border bg-muted/10 font-mono">
+                                                                    {col}
+                                                                </th>
+                                                            ))}
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {matrixData.rowValues.map((row: string) => (
+                                                            <tr key={row} className="border-b border-border group">
+                                                                <td className="px-6 py-5 font-black uppercase tracking-tighter text-xs italic border-r border-border bg-muted/5">
+                                                                    {row}
+                                                                </td>
+                                                                {matrixData.colValues.map((col: string) => {
+                                                                    const variant = matrixData.grid[row]?.[col];
+                                                                    if (!variant) return <td key={col} className="bg-muted/5" />;
+                                                                    return (
+                                                                        <td key={col} className="p-4 bg-white group-hover:bg-muted/5 transition-all">
+                                                                            <div className="flex flex-col gap-3 min-w-[120px]">
+                                                                                <div className="space-y-1">
+                                                                                    <label className="text-[7px] font-black uppercase text-muted-foreground ml-1">Price ($)</label>
                                                                                     <input
                                                                                         type="number"
                                                                                         value={variant.price}
-                                                                                        onChange={(e) => updateVariant(variant.id, 'price', e.target.value)}
-                                                                                        className="w-full bg-muted/30 px-6 py-3 rounded-2xl border-none outline-none font-bold text-[10px] uppercase tracking-widest focus:bg-white focus:ring-1 ring-black transition-all"
+                                                                                        onChange={(e) => updateVariant(variant.id, 'price', Number(e.target.value))}
+                                                                                        className="w-full bg-muted/30 px-3 py-2 rounded-xl border-none outline-none font-bold text-[10px] focus:bg-white focus:ring-1 ring-black transition-all"
                                                                                     />
                                                                                 </div>
-                                                                            </div>
-                                                                            <div className="space-y-4">
-                                                                                <div className="space-y-2">
-                                                                                    <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground ml-1">Stock Quantity</label>
+                                                                                <div className="space-y-1">
+                                                                                    <label className="text-[7px] font-black uppercase text-muted-foreground ml-1">Stock</label>
                                                                                     <input
                                                                                         type="number"
                                                                                         value={variant.stock}
-                                                                                        onChange={(e) => updateVariant(variant.id, 'stock', e.target.value)}
-                                                                                        className="w-full bg-muted/30 px-6 py-3 rounded-2xl border-none outline-none font-bold text-[10px] uppercase tracking-widest focus:bg-white focus:ring-1 ring-black transition-all"
+                                                                                        onChange={(e) => updateVariant(variant.id, 'stock', Number(e.target.value))}
+                                                                                        className="w-full bg-muted/30 px-3 py-2 rounded-xl border-none outline-none font-bold text-[10px] focus:bg-white focus:ring-1 ring-black transition-all"
                                                                                     />
                                                                                 </div>
-                                                                                <div className="space-y-2">
-                                                                                    <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground ml-1">Inventory Status</label>
-                                                                                    <select className="w-full bg-muted/30 px-6 py-3 rounded-2xl border-none outline-none font-bold text-[10px] uppercase tracking-widest appearance-none focus:bg-white focus:ring-1 ring-black transition-all">
-                                                                                        <option>In Stock</option>
-                                                                                        <option>Out of Stock</option>
-                                                                                        <option>On Backorder</option>
-                                                                                    </select>
+                                                                            </div>
+                                                                        </td>
+                                                                    );
+                                                                })}
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-6">
+                                                {variants.map((variant, vIdx) => {
+                                                    const isExpanded = expandedVariants.includes(variant.id);
+                                                    return (
+                                                        <motion.div
+                                                            key={variant.id}
+                                                            initial={{ opacity: 0, scale: 0.98 }}
+                                                            animate={{ opacity: 1, scale: 1 }}
+                                                            transition={{ delay: vIdx * 0.05 }}
+                                                            className="bg-white border border-border rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-xl transition-all"
+                                                        >
+                                                            {/* Row Header (Collapsed State) */}
+                                                            <div
+                                                                onClick={() => toggleVariant(variant.id)}
+                                                                className="bg-muted/30 p-6 flex justify-between items-center cursor-pointer group hover:bg-muted/50 transition-all"
+                                                            >
+                                                                <div className="flex gap-6 items-center">
+                                                                    <div className="w-14 h-14 bg-white rounded-2xl border border-border flex items-center justify-center shadow-inner overflow-hidden">
+                                                                        {variant.image ? (
+                                                                            <img src={variant.image} className="w-full h-full object-cover" alt="Variant" />
+                                                                        ) : (
+                                                                            <ImageIcon className="w-5 h-5 text-muted-foreground/30" />
+                                                                        )}
+                                                                    </div>
+                                                                    <div>
+                                                                        <div className="flex gap-2 items-center">
+                                                                            {Object.entries(variant.combination).map(([k, v]) => (
+                                                                                <span key={k} className="bg-black text-white text-[8px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md">{v}</span>
+                                                                            ))}
+                                                                        </div>
+                                                                        <p className="text-[10px] font-bold text-muted-foreground mt-1.5 uppercase tracking-widest">SKU: {variant.sku || 'UNASSIGNED'}</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="flex gap-10 items-center">
+                                                                    <div className="text-right">
+                                                                        <p className="text-[9px] font-black text-muted-foreground uppercase">Price</p>
+                                                                        <p className="text-sm font-black italic tracking-tighter">${variant.price || '0.00'}</p>
+                                                                    </div>
+                                                                    <div className="text-right">
+                                                                        <p className="text-[9px] font-black text-muted-foreground uppercase">Stock</p>
+                                                                        <p className="text-sm font-black italic tracking-tighter text-green-600">{variant.stock || '0'}</p>
+                                                                    </div>
+                                                                    <div className={cn(
+                                                                        "w-10 h-10 rounded-full flex items-center justify-center bg-white border border-border group-hover:bg-black group-hover:text-white transition-all",
+                                                                        isExpanded && "bg-black text-white rotate-180"
+                                                                    )}>
+                                                                        <ChevronDown className="w-4 h-4" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Expanded Row Content (Detailed WP Form) */}
+                                                            <AnimatePresence>
+                                                                {isExpanded && (
+                                                                    <motion.div
+                                                                        initial={{ height: 0, opacity: 0 }}
+                                                                        animate={{ height: "auto", opacity: 1 }}
+                                                                        exit={{ height: 0, opacity: 0 }}
+                                                                        className="overflow-hidden"
+                                                                    >
+                                                                        <div className="p-10 border-t border-border/50 bg-white grid grid-cols-3 gap-10">
+                                                                            {/* Left: Media */}
+                                                                            <div className="space-y-4">
+                                                                                <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Variant visual</label>
+                                                                                <label className="aspect-square bg-muted/20 border-2 border-dashed border-muted rounded-3xl flex flex-col items-center justify-center gap-3 hover:border-black cursor-pointer group transition-all p-6 overflow-hidden relative">
+                                                                                    <input
+                                                                                        type="file"
+                                                                                        accept="image/*"
+                                                                                        className="hidden"
+                                                                                        onChange={(e) => handleVariantImageAdd(variant.id, e)}
+                                                                                    />
+                                                                                    {uploadingVariantId === variant.id ? (
+                                                                                        <Loader2 className="w-6 h-6 animate-spin text-black" />
+                                                                                    ) : (variant.image || images[0]) ? (
+                                                                                        <>
+                                                                                            <img src={variant.image || images[0]} className={cn("absolute inset-0 w-full h-full object-cover", !variant.image && "opacity-30 grayscale")} alt="Variant" />
+                                                                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-all text-white text-[8px] font-black uppercase gap-2">
+                                                                                                <ImageIcon className="w-4 h-4" />
+                                                                                                {variant.image ? "Change Image" : "Add Unique Image"}
+                                                                                            </div>
+                                                                                            {!variant.image && (
+                                                                                                <div className="absolute bottom-2 left-2 right-2 bg-black/50 backdrop-blur-sm p-2 rounded-xl text-white text-[6px] font-black uppercase text-center leading-tight">Using Global DNA Visual</div>
+                                                                                            )}
+                                                                                        </>
+                                                                                    ) : (
+                                                                                        <>
+                                                                                            <div className="w-10 h-10 bg-white rounded-2xl flex items-center justify-center shadow-sm">
+                                                                                                <Plus className="w-5 h-5" />
+                                                                                            </div>
+                                                                                            <p className="text-[8px] font-black uppercase tracking-widest text-muted-foreground text-center">Add unique<br />image</p>
+                                                                                        </>
+                                                                                    )}
+                                                                                </label>
+                                                                            </div>
+
+                                                                            {/* Center/Right: Details */}
+                                                                            <div className="col-span-2 grid grid-cols-2 gap-8">
+                                                                                <div className="space-y-4">
+                                                                                    <div className="space-y-2">
+                                                                                        <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground ml-1">SKU</label>
+                                                                                        <input
+                                                                                            type="text"
+                                                                                            value={variant.sku}
+                                                                                            onChange={(e) => updateVariant(variant.id, 'sku', e.target.value)}
+                                                                                            className="w-full bg-muted/30 px-6 py-3 rounded-2xl border-none outline-none font-bold text-[10px] uppercase tracking-widest focus:bg-white focus:ring-1 ring-black transition-all"
+                                                                                        />
+                                                                                    </div>
+                                                                                    <div className="space-y-2">
+                                                                                        <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground ml-1">Regular Price ($)</label>
+                                                                                        <input
+                                                                                            type="number"
+                                                                                            value={variant.price}
+                                                                                            onChange={(e) => updateVariant(variant.id, 'price', e.target.value)}
+                                                                                            className="w-full bg-muted/30 px-6 py-3 rounded-2xl border-none outline-none font-bold text-[10px] uppercase tracking-widest focus:bg-white focus:ring-1 ring-black transition-all"
+                                                                                        />
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div className="space-y-4">
+                                                                                    <div className="space-y-2">
+                                                                                        <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground ml-1">Stock Quantity</label>
+                                                                                        <input
+                                                                                            type="number"
+                                                                                            value={variant.stock}
+                                                                                            onChange={(e) => updateVariant(variant.id, 'stock', e.target.value)}
+                                                                                            className="w-full bg-muted/30 px-6 py-3 rounded-2xl border-none outline-none font-bold text-[10px] uppercase tracking-widest focus:bg-white focus:ring-1 ring-black transition-all"
+                                                                                        />
+                                                                                    </div>
+                                                                                    <div className="space-y-2">
+                                                                                        <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground ml-1">Inventory Status</label>
+                                                                                        <select className="w-full bg-muted/30 px-6 py-3 rounded-2xl border-none outline-none font-bold text-[10px] uppercase tracking-widest appearance-none focus:bg-white focus:ring-1 ring-black transition-all">
+                                                                                            <option>In Stock</option>
+                                                                                            <option>Out of Stock</option>
+                                                                                            <option>On Backorder</option>
+                                                                                        </select>
+                                                                                    </div>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
-                                                                    </div>
-                                                                </motion.div>
-                                                            )}
-                                                        </AnimatePresence>
-                                                    </motion.div>
-                                                );
-                                            })}
-                                        </div>
+                                                                    </motion.div>
+                                                                )}
+                                                            </AnimatePresence>
+                                                        </motion.div>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>
