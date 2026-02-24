@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ShoppingBag, Search, Menu, User, X, Plus, Minus, ArrowRight, ShieldCheck, Truck, RefreshCw } from "lucide-react";
+import { ShoppingBag, X, Plus, Minus, ArrowRight, ShieldCheck, Truck } from "lucide-react";
 import { motion } from "framer-motion";
 import { useCart } from "@/context/CartContext";
 

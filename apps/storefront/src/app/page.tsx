@@ -2,10 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Star, ChevronRight, ArrowRight, Play, ShoppingBag, Search, Menu, User, Instagram, Twitter, Facebook, Plus, Minus, X, ArrowUpRight, Heart, Loader2 } from "lucide-react";
-import { useCart } from "@/context/CartContext";
-import { useWishlist } from "@/context/WishlistContext";
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { ArrowRight, ShoppingBag, Plus, ArrowUpRight, Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import { collection, onSnapshot, query, limit, orderBy } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -20,11 +18,8 @@ interface Product {
 
 export default function Home() {
   const containerRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"]
-  });
-  const { cart } = useCart();
+
+
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 

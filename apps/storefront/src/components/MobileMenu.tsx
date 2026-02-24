@@ -1,14 +1,12 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Search, User, ShoppingBag, Heart, ArrowRight } from "lucide-react";
+import { X, User, ShoppingBag, Heart } from "lucide-react";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
-import { useAuth } from "@/context/AuthContext";
 
 export default function MobileMenu() {
     const { isMenuOpen, setIsMenuOpen, cart } = useCart();
-    const { user } = useAuth();
 
     const menuItems = [
         { label: "Catalog", href: "/shop" },

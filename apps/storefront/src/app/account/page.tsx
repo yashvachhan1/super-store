@@ -1,15 +1,14 @@
 "use client";
 
-import Link from "next/link";
-import { User, Package, MapPin, CreditCard, Settings, LogOut, ArrowRight, Heart, ShoppingBag, Search, Menu, Loader2 } from "lucide-react";
+
+import { User, Package, MapPin, CreditCard, Settings, LogOut, ArrowRight, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
-import { useCart } from "@/context/CartContext";
+
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 
 export default function AccountPage() {
-    const { cart } = useCart();
     const { user, loading, logout } = useAuth();
     const router = useRouter();
     const [activeTab, setActiveTab] = useState("profile");

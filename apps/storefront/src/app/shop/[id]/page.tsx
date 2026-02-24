@@ -3,8 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { ShoppingBag, Search, Menu, User, Star, ArrowLeft, Heart, Share2, ShieldCheck, Truck, RefreshCw, Loader2, Plus, ArrowUpRight } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { ShoppingBag, Star, ArrowLeft, Heart, ShieldCheck, Truck, RefreshCw, Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { doc, getDoc, collection, query, limit, getDocs, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -12,7 +12,6 @@ import { cn } from "@/lib/utils";
 
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
-import Navbar from "@/components/Navbar";
 
 interface Variant {
   id: string;
@@ -42,7 +41,7 @@ interface Product {
 export default function ProductPage() {
   const { id } = useParams();
   const router = useRouter();
-  const { cart, addToCart } = useCart();
+  const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
 
   const [product, setProduct] = useState<Product | null>(null);
@@ -60,8 +59,7 @@ export default function ProductPage() {
 
         if (docSnap.exists()) {
           const data = docSnap.data();
-          const { id: _, ...rest } = data;
-          setProduct({ id: docSnap.id, ...rest } as Product);
+          setProduct({ id: docSnap.id, ...data } as Product);
 
           // Fetch related
           const q = query(

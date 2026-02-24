@@ -6,7 +6,7 @@ import { ArrowUpRight, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { db } from "@/lib/firebase";
-import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
+import { collection, query, where, getDocs } from "firebase/firestore";
 
 interface Blog {
     id: string;
@@ -16,7 +16,7 @@ interface Blog {
     category: string;
     date: string;
     image: string;
-    createdAt?: any;
+    createdAt?: { seconds: number; nanoseconds: number };
 }
 
 export default function JournalPage() {

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, Share2, Facebook, Twitter, Instagram, Loader2, User as UserIcon, Clock } from "lucide-react";
+import { ArrowLeft, Share2, Facebook, Twitter, Instagram, Loader2 } from "lucide-react";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -10,6 +10,8 @@ import { db } from "@/lib/firebase";
 import { collection, query, where, getDocs, limit } from "firebase/firestore";
 
 interface BlogPost {
+    id?: string;
+    slug: string;
     title: string;
     subtitle?: string;
     category: string;
@@ -27,7 +29,7 @@ export default function JournalPostPage() {
     const slug = params.slug as string;
     const containerRef = useRef<HTMLDivElement>(null);
     const [blog, setBlog] = useState<BlogPost | null>(null);
-    const [relatedBlogs, setRelatedBlogs] = useState<any[]>([]);
+    const [relatedBlogs, setRelatedBlogs] = useState<BlogPost[]>([]);
     const [loading, setLoading] = useState(true);
 
     const { scrollYProgress } = useScroll({
@@ -52,6 +54,7 @@ export default function JournalPostPage() {
                 if (!querySnapshot.empty) {
                     const data = querySnapshot.docs[0].data();
                     setBlog({
+                        slug: slug,
                         title: data.title,
                         subtitle: data.subtitle || data.excerpt,
                         category: data.category,
@@ -70,8 +73,8 @@ export default function JournalPostPage() {
                     );
                     const relatedSnap = await getDocs(relatedQ);
                     const filteredRelated = relatedSnap.docs
-                        .map(doc => ({ id: doc.id, ...doc.data() }))
-                        .filter((b: any) => b.slug !== slug)
+                        .map(doc => ({ id: doc.id, ...doc.data() } as BlogPost))
+                        .filter((b) => b.slug !== slug)
                         .slice(0, 3);
                     setRelatedBlogs(filteredRelated);
                 }

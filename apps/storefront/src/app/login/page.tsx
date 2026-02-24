@@ -30,8 +30,9 @@ export default function LoginPage() {
                 await updateProfile(userCredential.user, { displayName: name });
             }
             router.push("/account");
-        } catch (err: any) {
-            setError(err.message || "Something went wrong. Please try again.");
+        } catch (err: unknown) {
+            const errorMessage = err instanceof Error ? err.message : "Something went wrong. Please try again.";
+            setError(errorMessage);
         } finally {
             setLoading(false);
         }

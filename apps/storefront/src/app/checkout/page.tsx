@@ -1,7 +1,7 @@
 "use client";
 
 import { useCart } from "@/context/CartContext";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { ShieldCheck, Truck, ArrowLeft, CreditCard, Landmark, Apple } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -158,7 +158,7 @@ export default function CheckoutPage() {
                                 <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Arrives in 2-4 business days</span>
                             </div>
                             <div className="p-6 bg-gray-50 rounded-3xl">
-                                <p className="text-[9px] font-bold text-gray-400 leading-relaxed italic uppercase tracking-widest">"Refining the way you wear the future. Your order is handled with the utmost care by our technical delivery crew."</p>
+                                <p className="text-[9px] font-bold text-gray-400 leading-relaxed italic uppercase tracking-widest">&quot;Refining the way you wear the future. Your order is handled with the utmost care by our technical delivery crew.&quot;</p>
                             </div>
                         </div>
                     </div>
@@ -178,4 +178,4 @@ export default function CheckoutPage() {
     );
 }
 
-import { AnimatePresence } from "framer-motion";
+

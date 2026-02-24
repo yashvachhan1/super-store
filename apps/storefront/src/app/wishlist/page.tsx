@@ -2,13 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ShoppingBag, Search, Menu, User, Heart, X, ArrowLeft } from "lucide-react";
+import { Heart, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 
 export default function WishlistPage() {
-    const { cart, addToCart } = useCart();
+    const { addToCart } = useCart();
     const { wishlist, toggleWishlist } = useWishlist();
 
     return (

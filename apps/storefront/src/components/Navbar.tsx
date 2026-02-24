@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Search, Menu, User, ShoppingBag, Heart } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
-import { motion } from "framer-motion";
+
 
 export default function Navbar() {
     const { cart, setIsMenuOpen } = useCart();
