@@ -1,5 +1,5 @@
 import { Plus, Search, Edit2, Trash2, Filter, Download, Loader2 } from "lucide-react";
-import { motion } from "framer-motion";
+
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";

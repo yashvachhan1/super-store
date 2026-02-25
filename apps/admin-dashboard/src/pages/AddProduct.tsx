@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, ArrowLeft, Image as ImageIcon, Sparkles, Wand2, X, Box, ChevronDown, Loader2 } from "lucide-react";
+import { Plus, ArrowLeft, Image as ImageIcon, Sparkles, Wand2, X, Box, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";

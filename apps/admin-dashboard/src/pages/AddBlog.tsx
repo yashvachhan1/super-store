@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { ArrowLeft, Image as ImageIcon, Sparkles, X, FileText, Layout, Type, Plus, Loader2 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { db, storage } from "@/lib/firebase";
+import { db } from "@/lib/firebase";
 import { collection, addDoc, updateDoc, doc, getDoc, serverTimestamp } from "firebase/firestore";
 
 export default function AddBlog() {
