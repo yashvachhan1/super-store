@@ -123,22 +123,22 @@ export default function Categories() {
     );
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-6">
             <div className="flex justify-between items-end">
                 <div>
-                    <h1 className="text-4xl font-black uppercase tracking-tighter italic">Categories</h1>
-                    <p className="text-muted-foreground font-medium">Organize your products into a sleek hierarchy.</p>
+                    <h1 className="text-3xl font-bold tracking-tight text-gray-900">Categories</h1>
+                    <p className="text-sm text-muted-foreground font-medium mt-1">Organize your products into a sleek hierarchy.</p>
                 </div>
-                <div className="flex gap-4">
+                <div className="flex gap-3">
                     <button
                         onClick={() => setIsUploading(true)}
-                        className="border border-border bg-white text-black px-8 py-4 rounded-full font-black uppercase tracking-widest text-[10px] hover:bg-muted transition-all flex items-center gap-2"
+                        className="bg-white border border-border text-gray-900 px-5 py-2.5 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-muted transition-all flex items-center gap-2"
                     >
-                        <Upload className="w-4 h-4" /> Import CSV
+                        <Upload className="w-3.5 h-3.5" /> Import CSV
                     </button>
                     <button
                         onClick={() => setIsAdding(true)}
-                        className="bg-black text-white px-8 py-4 rounded-full font-black uppercase tracking-widest text-[10px] hover:shadow-2xl transition-all flex items-center gap-2"
+                        className="bg-black text-white px-6 py-2.5 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:shadow-lg transition-all flex items-center gap-2"
                     >
                         <Plus className="w-4 h-4" /> Add Category
                     </button>
@@ -157,12 +157,12 @@ export default function Categories() {
                             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
                         />
                         <motion.div
-                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            initial={{ opacity: 0, scale: 0.98, y: 10 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="bg-white rounded-[3rem] p-12 max-w-xl w-full relative z-[201] shadow-2xl text-center"
+                            exit={{ opacity: 0, scale: 0.98, y: 10 }}
+                            className="bg-white rounded-[2.5rem] p-10 max-w-xl w-full relative z-[201] shadow-2xl text-center border border-border"
                         >
-                            <h2 className="text-3xl font-black uppercase tracking-tighter italic mb-4">Bulk Import</h2>
+                            <h2 className="text-2xl font-bold tracking-tight text-gray-900 mb-2">Bulk Import</h2>
                             <p className="text-muted-foreground text-sm font-medium mb-8">Upload a CSV file to add categories in batches.</p>
 
                             {uploadProgress === null && (
@@ -236,16 +236,16 @@ export default function Categories() {
                 )}
             </AnimatePresence>
 
-            <div className="glass overflow-hidden rounded-[3rem]">
-                <div className="p-8 border-b border-border flex justify-between items-center bg-white/50">
-                    <div className="flex items-center gap-4 bg-muted/50 px-6 py-3 rounded-full w-96">
-                        <Search className="w-4 h-4 text-muted-foreground" />
+            <div className="bg-white border border-border overflow-hidden rounded-[2rem] shadow-sm">
+                <div className="p-6 border-b border-border flex justify-between items-center bg-gray-50/50">
+                    <div className="flex items-center gap-3 bg-white border border-border px-5 py-2 rounded-xl w-80 group focus-within:ring-2 focus-within:ring-black/5 transition-all">
+                        <Search className="w-3.5 h-3.5 text-muted-foreground" />
                         <input
                             type="text"
                             placeholder="Filter categories..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="bg-transparent border-none outline-none text-[11px] font-bold uppercase tracking-widest w-full"
+                            className="bg-transparent border-none outline-none text-[11px] font-semibold uppercase tracking-wider w-full placeholder:text-muted-foreground/40"
                         />
                     </div>
                 </div>
@@ -253,12 +253,12 @@ export default function Categories() {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="border-b border-border bg-muted/20">
-                                <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Category</th>
-                                <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Hierarchy</th>
-                                <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Items</th>
-                                <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Status</th>
-                                <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground text-right">Actions</th>
+                            <tr className="border-b border-border bg-gray-50/50">
+                                <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Category</th>
+                                <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Hierarchy</th>
+                                <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Items</th>
+                                <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Status</th>
+                                <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -270,45 +270,47 @@ export default function Categories() {
                                 </tr>
                             ) : filteredCategories.map((cat, i) => (
                                 <motion.tr
-                                    initial={{ opacity: 0, y: 10 }}
+                                    initial={{ opacity: 0, y: 5 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: i * 0.05 }}
+                                    transition={{ delay: i * 0.03 }}
                                     key={cat.id}
                                     className="group hover:bg-muted/30 transition-colors border-b border-border last:border-none"
                                 >
-                                    <td className="px-8 py-6">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 rounded-2xl bg-muted overflow-hidden border border-border flex-shrink-0">
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-xl bg-muted overflow-hidden border border-border flex-shrink-0">
                                                 {cat.image ? (
                                                     <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" />
                                                 ) : (
                                                     <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                                                        <ImageIcon className="w-4 h-4" />
+                                                        <ImageIcon className="w-3.5 h-3.5" />
                                                     </div>
                                                 )}
                                             </div>
-                                            <span className="font-black uppercase tracking-tight text-sm italic">{cat.name}</span>
+                                            <span className="font-semibold text-gray-900 text-sm">{cat.name}</span>
                                         </div>
                                     </td>
-                                    <td className="px-8 py-6">
+                                    <td className="px-6 py-4">
                                         {cat.parent ? (
-                                            <div className="flex items-center gap-2 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                                            <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                                                 <span>{cat.parent}</span>
-                                                <ChevronRight className="w-3 h-3" />
+                                                <ChevronRight className="w-2.5 h-2.5" />
                                                 <span className="text-black">{cat.name}</span>
                                             </div>
                                         ) : (
-                                            <span className="text-[10px] font-black text-black bg-black/5 px-3 py-1 rounded-full uppercase tracking-widest">Root</span>
+                                            <span className="text-[10px] font-bold text-gray-900 bg-gray-100 px-2.5 py-0.5 rounded-full uppercase tracking-wider">Root</span>
                                         )}
                                     </td>
-                                    <td className="px-8 py-6">
-                                        <span className="font-black italic text-sm">{cat.products}</span>
+                                    <td className="px-6 py-4">
+                                        <span className="font-semibold text-gray-900 text-sm">{cat.products}</span>
                                     </td>
-                                    <td className="px-8 py-6">
-                                        <span className="inline-block w-2 h-2 rounded-full bg-green-500 mr-2" />
-                                        <span className="text-[10px] font-black uppercase tracking-widest">{cat.status}</span>
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-2">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                                            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-900">{cat.status}</span>
+                                        </div>
                                     </td>
-                                    <td className="px-8 py-6 text-right">
+                                    <td className="px-6 py-4 text-right">
                                         <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <button className="p-2 hover:bg-black hover:text-white rounded-lg transition-all">
                                                 <Edit2 className="w-4 h-4" />
@@ -340,30 +342,30 @@ export default function Categories() {
                             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
                         />
                         <motion.div
-                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            initial={{ opacity: 0, scale: 0.98, y: 10 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="bg-white rounded-[3rem] p-12 max-w-2xl w-full relative z-[201] shadow-2xl"
+                            exit={{ opacity: 0, scale: 0.98, y: 10 }}
+                            className="bg-white rounded-[2.5rem] p-10 max-w-2xl w-full relative z-[201] shadow-2xl border border-border"
                         >
-                            <h2 className="text-3xl font-black uppercase tracking-tighter italic mb-8">New Category</h2>
+                            <h2 className="text-2xl font-bold tracking-tight text-gray-900 mb-8 border-b border-border pb-4">Create Category</h2>
                             <form className="space-y-6" onSubmit={handleCreateCategory}>
                                 <div className="grid grid-cols-2 gap-6">
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Title</label>
+                                        <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Title</label>
                                         <input
                                             type="text"
                                             value={newName}
                                             onChange={(e) => setNewName(e.target.value)}
                                             placeholder="e.g. Sneakers"
-                                            className="w-full bg-muted/30 px-6 py-4 rounded-2xl border-none outline-none font-bold uppercase tracking-widest text-xs focus:bg-white focus:ring-2 ring-black transition-all"
+                                            className="w-full bg-gray-50/50 px-5 py-3 rounded-xl border border-border outline-none font-semibold text-sm focus:bg-white focus:ring-2 ring-black/5 transition-all"
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Parent Category</label>
+                                        <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Parent Category</label>
                                         <select
                                             value={newParent}
                                             onChange={(e) => setNewParent(e.target.value)}
-                                            className="w-full bg-muted/30 px-6 py-4 rounded-2xl border-none outline-none font-bold uppercase tracking-widest text-xs focus:bg-white focus:ring-2 ring-black transition-all appearance-none cursor-pointer"
+                                            className="w-full bg-gray-50/50 px-5 py-3 rounded-xl border border-border outline-none font-semibold text-sm focus:bg-white focus:ring-2 ring-black/5 transition-all appearance-none cursor-pointer"
                                         >
                                             <option>None (Root)</option>
                                             {categories.filter(c => !c.parent).map(c => (
@@ -372,15 +374,14 @@ export default function Categories() {
                                         </select>
                                     </div>
                                 </div>
-
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Thumbnail URL</label>
+                                    <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Thumbnail URL</label>
                                     <input
                                         type="text"
                                         value={newImage}
                                         onChange={(e) => setNewImage(e.target.value)}
                                         placeholder="https://..."
-                                        className="w-full bg-muted/30 px-6 py-4 rounded-2xl border-none outline-none font-bold uppercase tracking-widest text-xs focus:bg-white focus:ring-2 ring-black transition-all"
+                                        className="w-full bg-gray-50/50 px-5 py-3 rounded-xl border border-border outline-none font-semibold text-sm focus:bg-white focus:ring-2 ring-black/5 transition-all"
                                     />
                                 </div>
 
@@ -388,11 +389,11 @@ export default function Categories() {
                                     <button
                                         type="submit"
                                         disabled={isSaving}
-                                        className="flex-1 bg-black text-white py-5 rounded-full font-black uppercase tracking-widest text-xs hover:shadow-2xl transition-all disabled:bg-muted-foreground"
+                                        className="flex-1 bg-black text-white py-3.5 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:shadow-lg transition-all disabled:bg-muted-foreground"
                                     >
                                         {isSaving ? "Creating..." : "Create Category"}
                                     </button>
-                                    <button type="button" onClick={() => setIsAdding(false)} className="px-10 py-5 rounded-full font-black uppercase tracking-widest text-xs border border-border hover:bg-muted transition-all">Cancel</button>
+                                    <button type="button" onClick={() => setIsAdding(false)} className="px-8 py-3.5 rounded-xl font-bold uppercase tracking-widest text-[10px] border border-border hover:bg-muted transition-all">Cancel</button>
                                 </div>
                             </form>
                         </motion.div>

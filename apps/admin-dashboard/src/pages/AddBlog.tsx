@@ -110,8 +110,8 @@ export default function AddBlog() {
     if (isFetching) {
         return (
             <div className="h-screen flex items-center justify-center text-muted-foreground gap-4">
-                <Loader2 className="w-8 h-8 animate-spin" />
-                <p className="text-[10px] font-black uppercase tracking-widest">Accessing Story Core...</p>
+                <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+                <p className="text-[10px] font-bold uppercase tracking-widest">Loading content...</p>
             </div>
         );
     }
@@ -120,33 +120,33 @@ export default function AddBlog() {
         <div className="max-w-6xl mx-auto space-y-12 pb-20">
             {/* Header */}
             <div className="flex justify-between items-center">
-                <div className="flex items-center gap-6">
+                <div className="flex items-center gap-4">
                     <button
                         onClick={() => navigate('/blogs')}
-                        className="w-12 h-12 rounded-full border border-border flex items-center justify-center hover:bg-black hover:text-white transition-all group"
+                        className="w-10 h-10 rounded-xl border border-border flex items-center justify-center hover:bg-muted transition-all group bg-white"
                     >
-                        <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
                     </button>
                     <div>
-                        <h1 className="text-4xl font-black uppercase tracking-tighter italic">{id ? 'Edit' : 'Create'} Journal</h1>
-                        <p className="text-muted-foreground font-medium uppercase text-[10px] tracking-widest mt-1">Editorial Protocol Engaged</p>
+                        <h1 className="text-3xl font-bold tracking-tight text-gray-900">{id ? 'Edit' : 'Create'} Post</h1>
+                        <p className="text-sm text-muted-foreground font-medium mt-1">Draft and publish your next brand story.</p>
                     </div>
                 </div>
-                <div className="flex gap-4">
+                <div className="flex gap-3">
                     <button
                         onClick={() => handleSave('Draft')}
                         disabled={isPublishing}
-                        className="px-10 py-5 rounded-full font-black uppercase tracking-widest text-[10px] border border-border hover:bg-muted transition-all disabled:opacity-50"
+                        className="bg-white border border-border text-gray-900 px-6 py-2.5 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-muted transition-all disabled:opacity-50"
                     >
                         Save Draft
                     </button>
                     <button
-                        onClick={() => handleSave(status === 'Published' ? 'Published' : 'Published')}
+                        onClick={() => handleSave('Published')}
                         disabled={isPublishing}
-                        className="px-10 py-5 rounded-full font-black uppercase tracking-widest text-[10px] bg-black text-white hover:shadow-2xl transition-all flex items-center gap-3 disabled:bg-muted-foreground"
+                        className="bg-black text-white px-8 py-2.5 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:shadow-lg transition-all flex items-center gap-2 disabled:opacity-50"
                     >
-                        {isPublishing ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                        {isPublishing ? "Synthesizing..." : id ? "Update Post" : "Publish Post"}
+                        {isPublishing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
+                        {isPublishing ? "Processing..." : id ? "Update Post" : "Publish Post"}
                     </button>
                 </div>
             </div>
@@ -155,37 +155,34 @@ export default function AddBlog() {
                 {/* Editor Side */}
                 <div className="lg:col-span-2 space-y-8">
                     {/* Main Content Area */}
-                    <div className="glass p-10 rounded-[3.5rem] space-y-10 border border-border bg-white shadow-sm overflow-hidden relative">
-                        {/* Decorative Top Bar */}
-                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-black/10 to-transparent" />
-
+                    <div className="bg-white border border-border p-8 rounded-3xl shadow-sm space-y-8">
                         <div className="space-y-6">
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Post Title</label>
+                                <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Post Title</label>
                                 <input
                                     type="text"
                                     value={title}
                                     onChange={(e) => setTitle(e.target.value)}
-                                    placeholder="DESIGNING THE FUTURE OF FOOTWEAR"
-                                    className="w-full bg-muted/20 px-10 py-8 rounded-[2.5rem] border-none outline-none font-black italic tracking-tighter text-3xl focus:bg-white focus:ring-4 ring-black/5 transition-all text-black uppercase"
+                                    placeholder="Enter post title..."
+                                    className="w-full bg-gray-50/50 px-6 py-4 rounded-2xl border border-border outline-none font-bold text-2xl focus:bg-white focus:ring-2 ring-black/5 transition-all text-gray-900"
                                 />
                             </div>
 
                             <div className="space-y-2 relative">
-                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Content Body</label>
-                                <div className="absolute top-10 right-10 flex gap-2">
-                                    <button className="p-2 hover:bg-black hover:text-white rounded-lg transition-all"><Type className="w-4 h-4" /></button>
-                                    <button className="p-2 hover:bg-black hover:text-white rounded-lg transition-all"><Layout className="w-4 h-4" /></button>
+                                <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Content Body</label>
+                                <div className="absolute top-10 right-6 flex gap-2">
+                                    <button className="p-1.5 hover:bg-gray-100 rounded-lg transition-all text-muted-foreground"><Type className="w-3.5 h-3.5" /></button>
+                                    <button className="p-1.5 hover:bg-gray-100 rounded-lg transition-all text-muted-foreground"><Layout className="w-3.5 h-3.5" /></button>
                                 </div>
                                 <textarea
                                     value={content}
                                     onChange={(e) => setContent(e.target.value)}
                                     placeholder="The narrative begins here..."
                                     rows={20}
-                                    className="w-full bg-muted/20 px-10 py-10 rounded-[3rem] border-none outline-none font-medium text-lg leading-relaxed focus:bg-white focus:ring-4 ring-black/5 transition-all resize-none mt-2 shadow-inner"
+                                    className="w-full bg-gray-50/50 px-8 py-8 rounded-2xl border border-border outline-none font-medium text-base leading-relaxed focus:bg-white focus:ring-2 ring-black/5 transition-all resize-none mt-2 shadow-inner"
                                 />
-                                <div className="absolute bottom-6 right-10">
-                                    <p className="text-[9px] font-black uppercase text-muted-foreground/30">{content.length} characters</p>
+                                <div className="absolute bottom-4 right-8">
+                                    <p className="text-[9px] font-bold uppercase text-muted-foreground/40">{content.length} characters</p>
                                 </div>
                             </div>
                         </div>
@@ -195,14 +192,19 @@ export default function AddBlog() {
                 {/* Sidebar Side */}
                 <div className="space-y-8">
                     {/* Featured Image */}
-                    <div className="glass p-8 rounded-[3rem] space-y-6 border border-border bg-white shadow-sm">
-                        <h4 className="text-[10px] font-black uppercase tracking-widest border-b border-border pb-4 flex items-center gap-2">
-                            <ImageIcon className="w-3 h-3" /> Featured Visual
+                    <div className="bg-white border border-border p-6 rounded-3xl shadow-sm space-y-6">
+                        <h4 className="text-[11px] font-bold uppercase tracking-wider text-gray-900 border-b border-border pb-3 flex items-center gap-2">
+                            <ImageIcon className="w-3.5 h-3.5" /> Featured Image
                         </h4>
 
                         <div
+<<<<<<< Updated upstream
                             onClick={() => document.getElementById('blog-image-upload')?.click()}
                             className="aspect-[4/3] bg-muted/30 border-2 border-dashed border-muted rounded-[2rem] flex flex-col items-center justify-center gap-4 hover:border-black cursor-pointer group transition-all relative overflow-hidden"
+=======
+                            onClick={handleUploadImage}
+                            className="aspect-video bg-gray-50 border border-dashed border-border rounded-xl flex flex-col items-center justify-center gap-3 hover:border-black cursor-pointer group transition-all relative overflow-hidden"
+>>>>>>> Stashed changes
                         >
                             <input
                                 id="blog-image-upload"
@@ -215,41 +217,41 @@ export default function AddBlog() {
                                 <Loader2 className="w-8 h-8 animate-spin text-black" />
                             ) : image ? (
                                 <>
-                                    <img src={image} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="Featured" />
+                                    <img src={image} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Featured" />
                                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all">
-                                        <button className="bg-white text-black px-6 py-2 rounded-full text-[9px] font-black uppercase">Change Image</button>
+                                        <p className="text-white text-[9px] font-bold uppercase tracking-widest">Change Visual</p>
                                     </div>
                                     <button
                                         onClick={(e) => { e.stopPropagation(); setImage(''); }}
-                                        className="absolute top-4 right-4 w-8 h-8 bg-black text-white rounded-full flex items-center justify-center"
+                                        className="absolute top-2 right-2 w-7 h-7 bg-white border border-border rounded-lg flex items-center justify-center hover:bg-red-50 transition-colors shadow-sm"
                                     >
-                                        <X className="w-4 h-4" />
+                                        <X className="w-3.5 h-3.5 text-red-500" />
                                     </button>
                                 </>
                             ) : (
                                 <>
-                                    <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center shadow-lg group-hover:bg-black group-hover:text-white transition-all transform group-hover:scale-110">
-                                        <Plus className="w-8 h-8" />
+                                    <div className="w-10 h-10 bg-white border border-border rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                                        <Plus className="w-5 h-5" />
                                     </div>
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Upload Header</p>
+                                    <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Add Visual</p>
                                 </>
                             )}
                         </div>
                     </div>
 
                     {/* Meta Data */}
-                    <div className="glass p-8 rounded-[3rem] space-y-6 border border-border bg-white shadow-sm">
-                        <h4 className="text-[10px] font-black uppercase tracking-widest border-b border-border pb-4 flex items-center gap-2">
-                            <FileText className="w-3 h-3" /> Post Config
+                    <div className="bg-white border border-border p-6 rounded-3xl shadow-sm space-y-6">
+                        <h4 className="text-[11px] font-bold uppercase tracking-wider text-gray-900 border-b border-border pb-3 flex items-center gap-2">
+                            <FileText className="w-3.5 h-3.5" /> Post Settings
                         </h4>
 
-                        <div className="space-y-6">
-                            <div className="space-y-2">
-                                <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground ml-1">Subject Category</label>
+                        <div className="space-y-5">
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-0.5">Category</label>
                                 <select
                                     value={category}
                                     onChange={(e) => setCategory(e.target.value)}
-                                    className="w-full bg-muted/30 px-6 py-5 rounded-2xl border-none outline-none font-bold uppercase tracking-widest text-[10px] focus:bg-white focus:ring-1 ring-black transition-all appearance-none cursor-pointer"
+                                    className="w-full bg-gray-50/50 px-4 py-2.5 rounded-xl border border-border outline-none font-bold uppercase tracking-wider text-[10px] appearance-none transition-all cursor-pointer focus:bg-white"
                                 >
                                     <option value="">Select Category</option>
                                     <option value="Fashion">Fashion</option>
@@ -259,16 +261,16 @@ export default function AddBlog() {
                                 </select>
                             </div>
 
-                            <div className="space-y-2">
-                                <label className="text-[8px] font-black uppercase tracking-widest text-muted-foreground ml-1">Publication Status</label>
-                                <div className="flex bg-muted/30 p-1.5 rounded-full gap-1">
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-0.5">Status</label>
+                                <div className="flex bg-gray-100 p-1 rounded-xl gap-1">
                                     {['Draft', 'Published'].map(s => (
                                         <button
                                             key={s}
                                             onClick={() => setStatus(s)}
                                             className={cn(
-                                                "flex-1 py-3 rounded-full text-[9px] font-black uppercase tracking-widest transition-all",
-                                                status === s ? "bg-black text-white shadow-xl" : "text-muted-foreground hover:text-black"
+                                                "flex-1 py-2 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all",
+                                                status === s ? "bg-white text-gray-900 shadow-sm border border-border" : "text-muted-foreground hover:text-gray-900"
                                             )}
                                         >
                                             {s}
@@ -280,13 +282,13 @@ export default function AddBlog() {
                     </div>
 
                     {/* AI Tools */}
-                    <div className="p-8 rounded-[3rem] bg-black text-white space-y-6 shadow-2xl relative overflow-hidden group">
-                        <Sparkles className="absolute -top-4 -right-4 w-24 h-24 text-white/5 group-hover:rotate-12 transition-transform duration-1000" />
-                        <h4 className="text-[10px] font-black uppercase tracking-widest border-b border-white/10 pb-4 relative z-10 flex items-center gap-2">
-                            <Sparkles className="w-3 h-3" /> Creative Intel
+                    <div className="p-8 rounded-3xl bg-black text-white space-y-6 shadow-xl relative overflow-hidden group">
+                        <Sparkles className="absolute -top-4 -right-4 w-20 h-20 text-white/5 group-hover:rotate-12 transition-transform duration-1000" />
+                        <h4 className="text-[11px] font-bold uppercase tracking-wider border-b border-white/10 pb-3 relative z-10 flex items-center gap-2">
+                            <Sparkles className="w-3.5 h-3.5" /> Creative Assistant
                         </h4>
-                        <p className="text-[10px] font-medium text-white/50 relative z-10 leading-relaxed uppercase tracking-tight">Need a professional brand narrative for this post?</p>
-                        <button className="w-full bg-white text-black py-4 rounded-full font-black uppercase tracking-widest text-[9px] hover:scale-105 transition-transform relative z-10 shadow-xl">
+                        <p className="text-[10px] font-medium text-white/50 relative z-10 leading-relaxed uppercase tracking-wider">Need a professional brand narrative for this post?</p>
+                        <button className="w-full bg-white text-black py-3 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:scale-[1.02] transition-transform relative z-10 shadow-lg">
                             Auto-Generate Story
                         </button>
                     </div>

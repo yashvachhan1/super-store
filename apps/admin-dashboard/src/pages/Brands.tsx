@@ -119,22 +119,22 @@ export default function Brands() {
     );
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-6">
             <div className="flex justify-between items-end">
                 <div>
-                    <h1 className="text-4xl font-black uppercase tracking-tighter italic">Brands</h1>
-                    <p className="text-muted-foreground font-medium">Manage your portfolio of elite partners.</p>
+                    <h1 className="text-3xl font-bold tracking-tight text-gray-900">Brands</h1>
+                    <p className="text-sm text-muted-foreground font-medium mt-1">Manage your portfolio of elite partners.</p>
                 </div>
-                <div className="flex gap-4">
+                <div className="flex gap-3">
                     <button
                         onClick={() => setIsUploading(true)}
-                        className="border border-border bg-white text-black px-8 py-4 rounded-full font-black uppercase tracking-widest text-[10px] hover:bg-muted transition-all flex items-center gap-2"
+                        className="bg-white border border-border text-gray-900 px-5 py-2.5 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-muted transition-all flex items-center gap-2"
                     >
-                        <Upload className="w-4 h-4" /> Import CSV
+                        <Upload className="w-3.5 h-3.5" /> Import CSV
                     </button>
                     <button
                         onClick={() => setIsAdding(true)}
-                        className="bg-black text-white px-8 py-4 rounded-full font-black uppercase tracking-widest text-[10px] hover:shadow-2xl transition-all flex items-center gap-2"
+                        className="bg-black text-white px-6 py-2.5 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:shadow-lg transition-all flex items-center gap-2"
                     >
                         <Plus className="w-4 h-4" /> Add Brand
                     </button>
@@ -153,12 +153,12 @@ export default function Brands() {
                             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
                         />
                         <motion.div
-                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            initial={{ opacity: 0, scale: 0.98, y: 10 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="bg-white rounded-[3rem] p-12 max-w-xl w-full relative z-[201] shadow-2xl text-center"
+                            exit={{ opacity: 0, scale: 0.98, y: 10 }}
+                            className="bg-white rounded-[2.5rem] p-10 max-w-xl w-full relative z-[201] shadow-2xl text-center border border-border"
                         >
-                            <h2 className="text-3xl font-black uppercase tracking-tighter italic mb-4">Bulk Import</h2>
+                            <h2 className="text-2xl font-bold tracking-tight text-gray-900 mb-2">Bulk Import</h2>
                             <p className="text-muted-foreground text-sm font-medium mb-8">Upload a CSV file to add brands in batches.</p>
 
                             {uploadProgress === null && (
@@ -232,16 +232,16 @@ export default function Brands() {
                 )}
             </AnimatePresence>
 
-            <div className="glass overflow-hidden rounded-[3rem]">
-                <div className="p-8 border-b border-border flex justify-between items-center bg-white/50">
-                    <div className="flex items-center gap-4 bg-muted/50 px-6 py-3 rounded-full w-96">
-                        <Search className="w-4 h-4 text-muted-foreground" />
+            <div className="bg-white border border-border overflow-hidden rounded-[2rem] shadow-sm">
+                <div className="p-6 border-b border-border flex justify-between items-center bg-gray-50/50">
+                    <div className="flex items-center gap-3 bg-white border border-border px-5 py-2 rounded-xl w-80 group focus-within:ring-2 focus-within:ring-black/5 transition-all">
+                        <Search className="w-3.5 h-3.5 text-muted-foreground" />
                         <input
                             type="text"
                             placeholder="Filter brands..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="bg-transparent border-none outline-none text-[11px] font-bold uppercase tracking-widest w-full"
+                            className="bg-transparent border-none outline-none text-[11px] font-semibold uppercase tracking-wider w-full placeholder:text-muted-foreground/40"
                         />
                     </div>
                 </div>
@@ -249,12 +249,12 @@ export default function Brands() {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="border-b border-border bg-muted/20">
-                                <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Brand</th>
-                                <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground">URL</th>
-                                <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Products</th>
-                                <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Status</th>
-                                <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground text-right">Actions</th>
+                            <tr className="border-b border-border bg-gray-50/50">
+                                <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Brand</th>
+                                <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">URL</th>
+                                <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Products</th>
+                                <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Status</th>
+                                <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -266,40 +266,42 @@ export default function Brands() {
                                 </tr>
                             ) : filteredBrands.map((brand, i) => (
                                 <motion.tr
-                                    initial={{ opacity: 0, y: 10 }}
+                                    initial={{ opacity: 0, y: 5 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: i * 0.05 }}
+                                    transition={{ delay: i * 0.03 }}
                                     key={brand.id}
                                     className="group hover:bg-muted/30 transition-colors border-b border-border last:border-none"
                                 >
-                                    <td className="px-8 py-6">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 rounded-2xl bg-muted overflow-hidden border border-border flex-shrink-0">
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-xl bg-muted overflow-hidden border border-border flex-shrink-0">
                                                 {brand.logo ? (
                                                     <img src={brand.logo} alt={brand.name} className="w-full h-full object-cover" />
                                                 ) : (
                                                     <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                                                        <ImageIcon className="w-4 h-4" />
+                                                        <ImageIcon className="w-3.5 h-3.5" />
                                                     </div>
                                                 )}
                                             </div>
-                                            <span className="font-black uppercase tracking-tight text-sm italic">{brand.name}</span>
+                                            <span className="font-semibold text-gray-900 text-sm">{brand.name}</span>
                                         </div>
                                     </td>
-                                    <td className="px-8 py-6">
-                                        <a href={brand.website} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-[10px] font-bold text-muted-foreground hover:text-black transition-colors uppercase tracking-widest">
+                                    <td className="px-6 py-4">
+                                        <a href={brand.website} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground hover:text-black transition-colors uppercase tracking-wider">
                                             <Globe className="w-3 h-3" />
                                             <span>{brand.website.replace('https://', '').replace('http://', '')}</span>
                                         </a>
                                     </td>
-                                    <td className="px-8 py-6">
-                                        <span className="font-black italic text-sm">{brand.products}</span>
+                                    <td className="px-6 py-4">
+                                        <span className="font-semibold text-gray-900 text-sm">{brand.products}</span>
                                     </td>
-                                    <td className="px-8 py-6">
-                                        <span className="inline-block w-2 h-2 rounded-full bg-green-500 mr-2" />
-                                        <span className="text-[10px] font-black uppercase tracking-widest">{brand.status}</span>
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-2">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                                            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-900">{brand.status}</span>
+                                        </div>
                                     </td>
-                                    <td className="px-8 py-6 text-right">
+                                    <td className="px-6 py-4 text-right">
                                         <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <button className="p-2 hover:bg-black hover:text-white rounded-lg transition-all">
                                                 <Edit2 className="w-4 h-4" />
@@ -331,44 +333,44 @@ export default function Brands() {
                             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
                         />
                         <motion.div
-                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            initial={{ opacity: 0, scale: 0.98, y: 10 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="bg-white rounded-[3rem] p-12 max-w-2xl w-full relative z-[201] shadow-2xl"
+                            exit={{ opacity: 0, scale: 0.98, y: 10 }}
+                            className="bg-white rounded-[2.5rem] p-10 max-w-2xl w-full relative z-[201] shadow-2xl border border-border"
                         >
-                            <h2 className="text-3xl font-black uppercase tracking-tighter italic mb-8">New Brand</h2>
+                            <h2 className="text-2xl font-bold tracking-tight text-gray-900 mb-8 border-b border-border pb-4">Create Brand</h2>
                             <form className="space-y-6" onSubmit={handleCreateBrand}>
                                 <div className="grid grid-cols-2 gap-6">
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Title</label>
+                                        <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Title</label>
                                         <input
                                             type="text"
                                             value={newName}
                                             onChange={(e) => setNewName(e.target.value)}
                                             placeholder="e.g. Nike"
-                                            className="w-full bg-muted/30 px-6 py-4 rounded-2xl border-none outline-none font-bold uppercase tracking-widest text-xs focus:bg-white focus:ring-2 ring-black transition-all"
+                                            className="w-full bg-gray-50/50 px-5 py-3 rounded-xl border border-border outline-none font-semibold text-sm focus:bg-white focus:ring-2 ring-black/5 transition-all"
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Official Website</label>
+                                        <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Official Website</label>
                                         <input
                                             type="text"
                                             value={newWebsite}
                                             onChange={(e) => setNewWebsite(e.target.value)}
                                             placeholder="https://..."
-                                            className="w-full bg-muted/30 px-6 py-4 rounded-2xl border-none outline-none font-bold uppercase tracking-widest text-xs focus:bg-white focus:ring-2 ring-black transition-all"
+                                            className="w-full bg-gray-50/50 px-5 py-3 rounded-xl border border-border outline-none font-semibold text-sm focus:bg-white focus:ring-2 ring-black/5 transition-all"
                                         />
                                     </div>
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Logo URL</label>
+                                    <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1">Logo URL</label>
                                     <input
                                         type="text"
                                         value={newLogo}
                                         onChange={(e) => setNewLogo(e.target.value)}
                                         placeholder="https://..."
-                                        className="w-full bg-muted/30 px-6 py-4 rounded-2xl border-none outline-none font-bold uppercase tracking-widest text-xs focus:bg-white focus:ring-2 ring-black transition-all"
+                                        className="w-full bg-gray-50/50 px-5 py-3 rounded-xl border border-border outline-none font-semibold text-sm focus:bg-white focus:ring-2 ring-black/5 transition-all"
                                     />
                                 </div>
 
@@ -376,11 +378,11 @@ export default function Brands() {
                                     <button
                                         type="submit"
                                         disabled={isSaving}
-                                        className="flex-1 bg-black text-white py-5 rounded-full font-black uppercase tracking-widest text-xs hover:shadow-2xl transition-all disabled:bg-muted-foreground"
+                                        className="flex-1 bg-black text-white py-3.5 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:shadow-lg transition-all disabled:bg-muted-foreground"
                                     >
                                         {isSaving ? "Creating..." : "Create Brand"}
                                     </button>
-                                    <button type="button" onClick={() => setIsAdding(false)} className="px-10 py-5 rounded-full font-black uppercase tracking-widest text-xs border border-border hover:bg-muted transition-all">Cancel</button>
+                                    <button type="button" onClick={() => setIsAdding(false)} className="px-8 py-3.5 rounded-xl font-bold uppercase tracking-widest text-[10px] border border-border hover:bg-muted transition-all">Cancel</button>
                                 </div>
                             </form>
                         </motion.div>
