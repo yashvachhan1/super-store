@@ -1,0 +1,25 @@
+Category,Feature,Description,Status
+Storefront,Dynamic Shop,Seamless product browsing with infinite scroll/pagination,DONE
+Storefront,Matrix Variants,High-performance grid selection for bulk orders,DONE
+Storefront,Advanced Search,Predictive search with suggestions and instant results,TODO
+Storefront,Smart Filters,Filter by Price range Attributes Brand and Availability,PARTIAL
+Storefront,Product Reviews,Customer ratings photo reviews and verified buyer badges,TODO
+Storefront,Wishlist,Save items for later with persistent storage,DONE
+Storefront,Related Products,You may also like upsells,TODO
+Storefront,Multicurrency,Automatic price conversion based on user location,TODO
+Storefront,Multilingual,Full i18n support for global reach,TODO
+Admin,Product Builder,Comprehensive simple/variable product creation,PARTIAL
+Admin,Order Manager,Full lifecycle tracking (Pending/Shipped/Delivered),TODO
+Admin,Inventory Alerts,Real-time stock tracking with low-inventory notifications,TODO
+Admin,Bulk Import/Export,CSV/Excel based management,PARTIAL
+Admin,Analytics Suite,Revenue Top Products Conversion Rate tracking,TODO
+Admin,Tenant Manager,Multi-store switching and global configuration,TODO
+Admin,RBAC,Role Based Access Control for Team Members,TODO
+Marketing,Coupons & Promos,Flexible discount codes (Fixed % BOGO),TODO
+Marketing,Abandoned Cart,Automated emails to recover lost sales,TODO
+Marketing,SEO Optimizer,Sitemap generator Schema markup Meta control,PARTIAL
+Marketing,Newsletter,Customer list management and email marketing,TODO
+Technical,Multi-tenancy,Isolated data and branding for "clients",PARTIAL
+Technical,Cloud Storage,Secure image storage with CDN,PARTIAL
+Technical,Auth Security,JWT or Firebase auth with Social Login,DONE
+Technical,Payment Gateway,Integrated Stripe Razorpay and COD,DONE
